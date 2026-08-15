@@ -1,0 +1,979 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Transaksi — Platform JB</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --fg: #f5f0e8;
+      --muted: #8a8378;
+      --accent: #e8a824;
+      --accent-hover: #f0bc4a;
+      --card: #1a1a1a;
+      --card-hover: #242424;
+      --border: #2a2a2a;
+      --danger: #e84040;
+      --success: #2ecc71;
+      --wa: #25D366;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* === Navbar === */
+    .navbar {
+      background-color: rgba(15, 15, 15, 0.92) !important;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1050;
+    }
+    .navbar-brand {
+      color: var(--accent) !important;
+      font-weight: 800;
+      font-size: 1.3rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .navbar .nav-link {
+      color: var(--fg) !important;
+      font-weight: 400;
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem !important;
+      border-radius: 8px;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+    .navbar .nav-link:hover,
+    .navbar .nav-link.active {
+      color: var(--accent) !important;
+      background-color: rgba(232, 168, 36, 0.08);
+    }
+    .navbar .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      transform: translateX(-50%) scaleX(0);
+      width: 20px;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: transform 0.25s ease;
+    }
+    .navbar .nav-link:hover::after,
+    .navbar .nav-link.active::after {
+      transform: translateX(-50%) scaleX(1);
+    }
+    .navbar-toggler {
+      border: 1px solid var(--border) !important;
+      padding: 4px 8px;
+    }
+    .navbar-toggler-icon { filter: invert(1); }
+
+    /* === Heading Section === */
+    .section-heading {
+      font-weight: 800;
+      font-size: 1.5rem;
+      margin-bottom: 0.3rem;
+      color: var(--fg);
+    }
+    .section-subheading {
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 300;
+      margin-bottom: 1.2rem;
+    }
+    .accent-line {
+      width: 50px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 3px;
+      margin-bottom: 0.8rem;
+    }
+
+    /* === Ringkasan Pesanan === */
+    .order-summary {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.2rem;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+    .order-summary.has-items {
+      display: block;
+      animation: card-in 0.4s ease forwards;
+    }
+    .order-summary-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.8rem;
+      gap: 8px;
+    }
+    .order-summary-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--fg);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .order-summary-badge {
+      background: rgba(232, 168, 36, 0.15);
+      color: var(--accent);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 20px;
+    }
+    .order-summary-clear {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-family: 'Poppins', sans-serif;
+      padding: 4px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .order-summary-clear:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+    .order-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .order-list li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 10px;
+      font-size: 0.82rem;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+    .order-list li .item-name {
+      color: var(--fg);
+      font-weight: 500;
+    }
+    .order-list li .item-price {
+      color: var(--accent);
+      font-weight: 700;
+      white-space: nowrap;
+      margin-left: 8px;
+    }
+    .order-total {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      font-weight: 800;
+      font-size: 1rem;
+    }
+    .order-total .total-label { color: var(--muted); font-weight: 500; }
+    .order-total .total-amount { color: var(--accent); }
+    .btn-wa-bulk {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px;
+      background: var(--wa);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+    .btn-wa-bulk:hover {
+      background: #1fb855;
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(37, 211, 102, 0.3);
+    }
+    .btn-wa-bulk:active { transform: scale(0.97); }
+
+    /* === Product Card === */
+    .product-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .product-card:hover {
+      background: var(--card-hover);
+      border-color: rgba(232, 168, 36, 0.25);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(232, 168, 36, 0.1);
+    }
+    .product-card .card-img-wrapper {
+      position: relative;
+      overflow: hidden;
+      background: #111;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+    }
+    .product-card .card-img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 8px;
+      transition: transform 0.4s ease;
+    }
+    .product-card:hover .card-img-wrapper img {
+      transform: scale(1.05);
+    }
+    .product-card .card-body {
+      padding: 0.75rem 0.9rem 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      flex: 1;
+    }
+    .product-card .product-name {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--fg);
+      line-height: 1.3;
+    }
+
+    .price-tag {
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--accent);
+      display: flex;
+      align-items: baseline;
+      gap: 2px;
+    }
+    .price-tag .currency {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    /* === Tombol Order WhatsApp === */
+    .btn-order {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 10px 12px;
+      background: rgba(37, 211, 102, 0.1);
+      border: 1px solid rgba(37, 211, 102, 0.25);
+      color: var(--wa);
+      border-radius: 10px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 0.82rem;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      margin-top: auto;
+      min-height: 40px;
+    }
+    .btn-order:hover {
+      background: var(--wa);
+      color: #fff;
+      border-color: var(--wa);
+      transform: scale(1.03);
+      box-shadow: 0 4px 20px rgba(37, 211, 102, 0.3);
+    }
+    .btn-order:active { transform: scale(0.97); }
+
+    /* === Carousel === */
+    .promo-carousel .carousel-inner {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .promo-carousel .carousel-item img {
+      width: 100%;
+      height: auto;
+      max-height: 200px;
+      object-fit: cover;
+      display: block;
+    }
+    @media (min-width: 576px) {
+      .promo-carousel .carousel-item img { max-height: 260px; }
+    }
+    @media (min-width: 768px) {
+      .promo-carousel .carousel-item img { max-height: 300px; }
+    }
+    .promo-carousel .carousel-indicators { bottom: 8px; }
+    .promo-carousel .carousel-indicators [data-bs-target] {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background-color: var(--muted);
+      border: none; opacity: 0.5;
+      transition: all 0.3s ease;
+    }
+    .promo-carousel .carousel-indicators .active {
+      background-color: var(--accent);
+      opacity: 1; width: 24px; border-radius: 4px;
+    }
+    .carousel-control-prev,
+    .carousel-control-next {
+      width: 40px; height: 40px;
+      top: 50%; transform: translateY(-50%);
+      bottom: auto;
+      background: rgba(15, 15, 15, 0.7);
+      border-radius: 50%;
+      margin: 0 10px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .carousel:hover .carousel-control-prev,
+    .carousel:hover .carousel-control-next { opacity: 1; }
+
+    /* Selalu tampilkan kontrol carousel di mobile */
+    @media (max-width: 767px) {
+      .carousel-control-prev,
+      .carousel-control-next {
+        opacity: 0.7;
+        width: 32px;
+        height: 32px;
+        margin: 0 6px;
+      }
+    }
+
+    .site-footer {
+      margin-top: 3rem;
+      padding: 1.5rem 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    /* === Animasi Masuk === */
+    .product-card {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: card-in 0.5s ease forwards;
+    }
+    .product-card:nth-child(1) { animation-delay: 0.05s; }
+    .product-card:nth-child(2) { animation-delay: 0.1s; }
+    .product-card:nth-child(3) { animation-delay: 0.15s; }
+    .product-card:nth-child(4) { animation-delay: 0.2s; }
+    .product-card:nth-child(5) { animation-delay: 0.25s; }
+    .product-card:nth-child(6) { animation-delay: 0.3s; }
+    .product-card:nth-child(7) { animation-delay: 0.35s; }
+    .product-card:nth-child(8) { animation-delay: 0.4s; }
+    .product-card:nth-child(9) { animation-delay: 0.45s; }
+
+    @keyframes card-in {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* === Toast === */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      left: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    .custom-toast {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--fg);
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-family: 'Poppins', sans-serif;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      animation: toast-in 0.4s ease, toast-out 0.4s ease 2.6s forwards;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      max-width: 100%;
+    }
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateX(40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes toast-out {
+      to { opacity: 0; transform: translateX(40px); }
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+    /* ========================================
+       RESPONSIF MOBILE — Perbaikan Utama
+       ======================================== */
+    @media (max-width: 575px) {
+
+      /* Container padding lebih longgar */
+      .container {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+      }
+
+      /* Navbar brand */
+      .navbar-brand {
+        font-size: 1.1rem;
+      }
+
+      /* Menu mobile lebih besar & nyaman disentuh */
+      .navbar-collapse {
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--border);
+      }
+
+      .navbar .nav-link {
+        font-size: 1rem !important;
+        padding: 0.7rem 0.85rem !important;
+        border-radius: 10px;
+        margin-bottom: 2px;
+      }
+
+      /* Heading lebih besar */
+      .section-heading {
+        font-size: 1.3rem;
+      }
+
+      .section-subheading {
+        font-size: 0.88rem;
+        margin-bottom: 1rem;
+      }
+
+      .accent-line {
+        width: 44px;
+        height: 3px;
+        margin-bottom: 0.7rem;
+      }
+
+      /* === Ringkasan pesanan — disesuaikan untuk mobile === */
+      .order-summary {
+        padding: 0.9rem;
+        border-radius: 14px;
+      }
+
+      .order-summary-header {
+        margin-bottom: 0.65rem;
+      }
+
+      .order-summary-title {
+        font-size: 0.92rem;
+        gap: 6px;
+      }
+
+      .order-summary-badge {
+        font-size: 0.68rem;
+        padding: 2px 8px;
+      }
+
+      .order-summary-clear {
+        font-size: 0.75rem;
+        padding: 5px 10px;
+        min-height: 32px;
+        display: flex;
+        align-items: center;
+      }
+
+      .order-list {
+        gap: 5px;
+      }
+
+      .order-list li {
+        padding: 7px 10px;
+        font-size: 0.82rem;
+        border-radius: 8px;
+      }
+
+      .order-list li .item-name {
+        font-weight: 600;
+      }
+
+      .order-list li .item-price {
+        font-size: 0.8rem;
+      }
+
+      .order-total {
+        font-size: 1.05rem;
+        margin-top: 8px;
+        padding-top: 8px;
+      }
+
+      .btn-wa-bulk {
+        font-size: 0.92rem;
+        font-weight: 700;
+        padding: 13px 12px;
+        min-height: 48px;
+        border-radius: 12px;
+      }
+
+      .btn-wa-bulk i {
+        font-size: 1.15rem;
+      }
+
+      /* === INTI: Kurangi padding gambar agar gambar lebih besar === */
+      .product-card .card-img-wrapper {
+        padding: 5px;
+      }
+
+      /* Perkecil gap dan padding card body */
+      .product-card .card-body {
+        padding: 0.6rem 0.65rem 0.75rem;
+        gap: 0.3rem;
+      }
+
+      /* Perbesar font nama produk */
+      .product-card .product-name {
+        font-size: 0.92rem;
+        font-weight: 700;
+      }
+
+      /* Perbesar harga */
+      .price-tag {
+        font-size: 1.1rem;
+      }
+
+      .price-tag .currency {
+        font-size: 0.75rem;
+      }
+
+      /* === Tombol order WA: area sentuh minimal 44px === */
+      .btn-order {
+        font-size: 0.88rem;
+        font-weight: 700;
+        padding: 10px 8px;
+        min-height: 44px;
+        border-radius: 10px;
+        gap: 6px;
+      }
+
+      .btn-order i {
+        font-size: 1rem;
+      }
+
+      /* Footer */
+      .site-footer {
+        font-size: 0.78rem;
+        padding: 1.3rem 0;
+      }
+
+      /* Toast full-width di HP */
+      .toast-container {
+        left: 12px;
+        right: 12px;
+        bottom: 16px;
+        align-items: stretch;
+      }
+
+      .custom-toast {
+        font-size: 0.88rem;
+        padding: 14px 16px;
+        justify-content: center;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .product-card { animation: none !important; opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <i class="fas fa-store me-2"></i>Platform JB
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="https://jb-gag.vercel.app" target="_self"><i class="fas fa-home me-1"></i> Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://daftar-item-six.vercel.app" target="_self"><i class="fas fa-boxes-stacked me-1"></i> Daftar Item</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://daftar-harga-six.vercel.app" target="_self"><i class="fas fa-tags me-1"></i> Daftar Harga</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="https://transaksi-psi.vercel.app" target="_self"><i class="fas fa-receipt me-1"></i> Transaksi</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container pb-4">
+
+    <!-- ========== RINGKASAN PESANAN ========== -->
+    <section class="mt-3" aria-label="Ringkasan Pesanan">
+      <div class="order-summary" id="orderSummary">
+        <div class="order-summary-header">
+          <span class="order-summary-title">
+            <i class="fas fa-clipboard-list" style="color: var(--accent);"></i>
+            Pesanan Anda
+            <span class="order-summary-badge" id="itemCount">0</span>
+          </span>
+          <button class="order-summary-clear" id="clearCart" aria-label="Hapus semua pesanan">
+            <i class="fas fa-trash-can me-1"></i>Hapus
+          </button>
+        </div>
+        <ul class="order-list" id="orderList"></ul>
+        <div class="order-total">
+          <span class="total-label">Total</span>
+          <span class="total-amount" id="orderTotal">Rp0</span>
+        </div>
+        <a href="#" class="btn-wa-bulk" id="waBulkOrder" target="_blank" rel="noopener">
+          <i class="fab fa-whatsapp" style="font-size:1.1rem;"></i>
+          Kirim Semua via WhatsApp
+        </a>
+      </div>
+    </section>
+
+    <!-- ========== DAFTAR PRODUK TRANSAKSI ========== -->
+    <section class="mt-2" aria-label="Pesan Produk">
+      <div class="accent-line"></div>
+      <h2 class="section-heading">Pesan Langsung</h2>
+      <p class="section-subheading">Pilih produk lalu order langsung melalui WhatsApp</p>
+
+      <div class="row g-3">
+
+        <!-- Produk 1 -->
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="product-card">
+            <div class="card-img-wrapper">
+              <img src="https://lh3.googleusercontent.com/pw/AP1GczPKQs7MPHLCbA1BS9WPCt3Y7f7-4SVLbbUVFYC_MPLzi2ziOQxB7clG9P8RLYp5Sl2WlZ41P8apTlTqINezMNeq2q1JW7fFwLWQTR5jq5bS1MnVQNgnfVJSBBAR3az30UiAeVuMM2f0yS0LOI8GoGeN8w=w317-h348-s-no-gm?authuser=0" alt="Produk 1">
+            </div>
+            <div class="card-body">
+              <span class="product-name">Produk 1</span>
+              <span class="price-tag"><span class="currency">Rp</span>1.000</span>
+              <button type="button" class="btn-order" onclick="orderWA('Produk 1', 1000)">
+                <i class="fab fa-whatsapp"></i> Order Now
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Produk 2 -->
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="product-card">
+            <div class="card-img-wrapper">
+              <img src="https://lh3.googleusercontent.com/pw/AP1GczPIFGaTI1Xdw5dMNbJsqWvwuS4leVXyLw4Dv7TWMd2rvk2hfPA-pgFhAAsFdXhHvsy-on2oIYL2X2A2esbrd8rPidR2crHf0J9qsGCznsiykH3ZTH9P0IbJXWoksmwSiUcHBxKJOfxQhHrJOFPEvm9yzQ=w324-h347-s-no-gm?authuser=0" alt="Produk 2">
+            </div>
+            <div class="card-body">
+              <span class="product-name">Produk 2</span>
+              <span class="price-tag"><span class="currency">Rp</span>1.000</span>
+              <button type="button" class="btn-order" onclick="orderWA('Produk 2', 1000)">
+                <i class="fab fa-whatsapp"></i> Order Now
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Produk 3 -->
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="product-card">
+            <div class="card-img-wrapper">
+              <img src="https://lh3.googleusercontent.com/pw/AP1GczPB8kb5DHe_PCy7aOa1Xp1SDWePAee0TQeYz1qT0uuWNg-U_NLPQlhu1CPW9sx0Hl51S1crX1yoU9qfGWoEPDIgZsS2OQ15qGOyOP6AYPGf1MRznBPK4stuapDII5w040AdFI-pciYRnrx5dplUYNPtIQ=w331-h347-s-no-gm?authuser=0" alt="Produk 3">
+            </div>
+            <div class="card-body">
+              <span class="product-name">Produk 3</span>
+              <span class="price-tag"><span class="currency">Rp</span>1.000</span>
+              <button type="button" class="btn-order" onclick="orderWA('Produk 3', 1000)">
+                <i class="fab fa-whatsapp"></i> Order Now
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Produk 4 -->
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="product-card">
+            <div class="card-img-wrapper">
+              <img src="https://lh3.googleusercontent.com/pw/AP1GczP2VQkkvqDUdo-kovMeNf_o7S2o4ZcWMzwARsN6f4Hr0QQu7O-Hhi-ksDDUoZxqq7BL97OVDzRQeP6PwbMXT25CcEIQS8uRm-VaPXFjN5xR8wVbdxuRX_jwzopn8KBUPnofZPH2T5hTQbiVgDCRhAmUbw=w286-h331-s-no-gm?authuser=0" alt="Produk 4">
+            </div>
+            <div class="card-body">
+              <span class="product-name">Produk 4</span>
+              <span class="price-tag"><span class="currency">Rp</span>1.000</span>
+              <button type="button" class="btn-order" onclick="orderWA('Produk 4', 1000)">
+                <i class="fab fa-whatsapp"></i> Order Now
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Produk 5 -->
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="product-card">
+            <div class="card-img-wrapper">
+              <img src="https://lh3.googleusercontent.com/pw/AP1GczOr3HOpP1JSJC39eEjaxqmhr3b5k_nvBG4CsQu2VN104uack9fScs_E0qg6lPWoSmKGsmqgwHxHsUTmYRCktQFcD2rzE6fkbE1kY2T-P27Pj8HlgC9gJVmMEHS3HfzsU_mWc-LLDvIdtlQDygrSpnZAEA=w362-h330-s-no-gm?authuser=0" alt="Produk 5">
+            </div>
+            <div class="card-body">
+              <span class="product-name">Produk 5</span>
+              <span class="price-tag"><span class="currency">Rp</span>100</span>
+              <button type="button" class="btn-order" onclick="orderWA('Produk 5', 100)">
+                <i class="fab fa-whatsapp"></i> Order Now
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Produk 6 -->
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="product-card">
+            <div class="card-img-wrapper">
+              <img src="https://lh3.googleusercontent.com/pw/AP1GczO5Kzrui9jCelnCsS3eyl1Y7P0o4yuVh5z4MCKyiKkmGyXCaK9_qIzNo__5M0YJbVoz-p5-Y_bihgqzVK6d2LjGBsDm0Jo4rpJ6nDkl44SGr4wp0x7IOgH0XG7GFYm6vsbi6jn8yTJ78xXLumkXjF2XzA=w332-h331-s-no-gm?authuser=0" alt="Produk 6">
+            </div>
+            <div class="card-body">
+              <span class="product-name">Produk 6</span>
+              <span class="price-tag"><span class="currency">Rp</span>100</span>
+              <button type="button" class="btn-order" onclick="orderWA('Produk 6', 100)">
+                <i class="fab fa-whatsapp"></i> Order Now
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Produk 7 -->
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="product-card">
+            <div class="card-img-wrapper">
+              <img src="https://lh3.googleusercontent.com/pw/AP1GczPnKUADW19_mfcuOPEYJ_jV99rhmMh1NyZ77MuWbuP25D4a9TYsJvUI491frLFzVbToyosBJtCgXHIJOlpL677Aadrk-mV5QNeNeESTbmzcdAMBWgUrGXp1KvKQ9x8g3qZJhnv6eZQMZzi72VBwJmkocw=w318-h372-s-no-gm?authuser=0" alt="Produk 7">
+            </div>
+            <div class="card-body">
+              <span class="product-name">Produk 7</span>
+              <span class="price-tag"><span class="currency">Rp</span>100</span>
+              <button type="button" class="btn-order" onclick="orderWA('Produk 7', 100)">
+                <i class="fab fa-whatsapp"></i> Order Now
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Produk 8 -->
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="product-card">
+            <div class="card-img-wrapper">
+              <img src="https://lh3.googleusercontent.com/pw/AP1GczMMb_2EQM2sIbA0NZeBue-4W1U2RhGZy6xz3fOXcB33fhRUtUlt-z4aFD9IlanlJlpfCDCiKriu8R_AOMFK-bSeLYl2-WmtGByuRUVlb6Df7zFoDpO72BWuJigiGF0gs8m6AEqMWYq-4Kwi37Aaox-fxw=w323-h372-s-no-gm?authuser=0" alt="Produk 8">
+            </div>
+            <div class="card-body">
+              <span class="product-name">Produk 8</span>
+              <span class="price-tag"><span class="currency">Rp</span>300</span>
+              <button type="button" class="btn-order" onclick="orderWA('Produk 8', 300)">
+                <i class="fab fa-whatsapp"></i> Order Now
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Produk 9 -->
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="product-card">
+            <div class="card-img-wrapper">
+              <img src="https://lh3.googleusercontent.com/pw/AP1GczPCNGq-s96q7dWUJVTJI89ck9CoDpUUzbpQ2VMC3_tm56Z8F_5XL7Ep4GnPazRx2KRfrbwu2rbUTw1PgETDTDxZJaGcHeohqOlbpQeFyPlnqI-6iRByRmoWgkdAi9rWhGrUb-qoKf-Fe23BMTj5b4G1QA=w319-h373-s-no-gm?authuser=0" alt="Produk 9">
+            </div>
+            <div class="card-body">
+              <span class="product-name">Produk 9</span>
+              <span class="price-tag"><span class="currency">Rp</span>500</span>
+              <button type="button" class="btn-order" onclick="orderWA('Produk 9', 500)">
+                <i class="fab fa-whatsapp"></i> Order Now
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========== PROMO CAROUSEL ========== -->
+    <section class="mt-4" aria-label="Promo">
+      <div id="promoCarousel" class="carousel slide promo-carousel" data-bs-ride="carousel" data-bs-interval="4000">
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+          <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+          <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img src="https://lh3.googleusercontent.com/pw/AP1GczPn3Krt0WCI1KgesQJKhYXjMzoLucu1RiQd9KmOsyEN6o9sqQ2aJr2_qGBTtEyz9r4gZZ49lr-whlyFIUK6HYubvChlrp2ouxhDEi8JZ5fdLYoRvh1aC3ANih8biraG43ynwUhh2js26FLgkrpc6eioSA=w380-h214-s-no-gm?authuser=0" alt="Promo 1">
+          </div>
+          <div class="carousel-item">
+            <img src="https://lh3.googleusercontent.com/pw/AP1GczP70wmGjRAQItStzpBF7sNH4-lwSTmHGvyxqaKOO9o_UrVSr6pR3uIz0n18mSNekeEGVRFii-jPhK9FtJh-QiW6alXe7Yu_-fPo_tby9z8U2hWHnHg7eg3OGmRyPU6aG2HWzOzd0B-WAs2oJ1T1JAAk1Q=w1304-h599-s-no-gm?authuser=0" alt="Promo 2">
+          </div>
+          <div class="carousel-item">
+            <img src="https://lh3.googleusercontent.com/pw/AP1GczO-U1CAcWwK_c4hTDIkO11VubPv7afpuvaIhoG_KOTY-oBE8vYoFjrDNuUVNEoYxsoG114bRm5LSDOWIXw6ZxDIFz9Z1OgkGJkOtBYZYFleZB5d17dBLuQgnwFOS66WrBwioo0JLuu0iPC5snXIlPMvlQ=w898-h599-s-no-gm?authuser=0" alt="Promo 3">
+          </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#promoCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#promoCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="site-footer">
+    <div class="container">
+      <p class="mb-0">&copy; Aji setyo nugroho Platform JB. Semua hak dilindungi.</p>
+    </div>
+  </footer>
+
+  <!-- ========== TOAST CONTAINER ========== -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+  <script>
+    // ============================================================
+    //  KONFIGURASI WHATSAPP
+    // ============================================================
+    var WA_PHONE = '6285780476538';
+    var WA_QR_URL = 'https://wa.me/qr/GVSAHHS34PXIK1';
+
+    function buildWaUrl(text) {
+      if (WA_PHONE) {
+        return 'https://wa.me/' + WA_PHONE + '?text=' + encodeURIComponent(text);
+      }
+      return WA_QR_URL;
+    }
+
+    function formatRp(n) {
+      return 'Rp' + n.toLocaleString('id-ID');
+    }
+
+    function showToast(message, icon) {
+      var container = document.getElementById('toastContainer');
+      var toast = document.createElement('div');
+      toast.className = 'custom-toast';
+      toast.innerHTML = '<i class="' + (icon || 'fas fa-circle-info') + '" style="color: var(--accent);"></i> ' + message;
+      container.appendChild(toast);
+      setTimeout(function() {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 3200);
+    }
+
+    function orderWA(nama, harga) {
+      var cart = JSON.parse(localStorage.getItem('jb_cart') || '[]');
+      cart.push({ nama: nama, harga: harga, waktu: Date.now() });
+      localStorage.setItem('jb_cart', JSON.stringify(cart));
+
+      renderSummary();
+
+      var pesan = 'Halo, saya ingin memesan:\n\n' +
+                  '- ' + nama + ' (' + formatRp(harga) + ')\n\n' +
+                  'Terima kasih.';
+
+      window.open(buildWaUrl(pesan), '_blank');
+
+      showToast(nama + ' — ' + formatRp(harga) + ' dikirim via WA', 'fab fa-whatsapp');
+    }
+
+    function renderSummary() {
+      var cart = JSON.parse(localStorage.getItem('jb_cart') || '[]');
+      var summary = document.getElementById('orderSummary');
+      var listEl = document.getElementById('orderList');
+      var countEl = document.getElementById('itemCount');
+      var totalEl = document.getElementById('orderTotal');
+      var bulkBtn = document.getElementById('waBulkOrder');
+
+      if (cart.length === 0) {
+        summary.classList.remove('has-items');
+        return;
+      }
+
+      summary.classList.add('has-items');
+      countEl.textContent = cart.length;
+
+      var total = 0;
+      var html = '';
+      cart.forEach(function(item) {
+        total += item.harga;
+        html += '<li>' +
+                  '<span class="item-name">' + item.nama + '</span>' +
+                  '<span class="item-price">' + formatRp(item.harga) + '</span>' +
+                '</li>';
+      });
+      listEl.innerHTML = html;
+      totalEl.textContent = formatRp(total);
+
+      var pesan = 'Halo, saya ingin memesan:\n\n';
+      cart.forEach(function(item, i) {
+        pesan += (i + 1) + '. ' + item.nama + ' (' + formatRp(item.harga) + ')\n';
+      });
+      pesan += '\nTotal: ' + formatRp(total) + '\n\nTerima kasih.';
+      bulkBtn.href = buildWaUrl(pesan);
+    }
+
+    document.getElementById('clearCart').addEventListener('click', function() {
+      localStorage.removeItem('jb_cart');
+      renderSummary();
+      showToast('Semua pesanan dihapus', 'fas fa-trash-can');
+    });
+
+    document.querySelectorAll('#navbarNav .nav-link').forEach(function(link) {
+      link.addEventListener('click', function() {
+        var navCollapse = document.getElementById('navbarNav');
+        var bsCollapse = bootstrap.Collapse.getInstance(navCollapse);
+        if (bsCollapse) bsCollapse.hide();
+      });
+    });
+
+    renderSummary();
+  </script>
+</body>
+</html>
